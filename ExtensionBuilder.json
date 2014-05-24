@@ -1,0 +1,45 @@
+{
+    "modules": [
+
+    ],
+    "properties": {
+        "backendModules": [
+
+        ],
+        "description": "Customized examples for the REST extension",
+        "emConf": {
+            "category": "plugin",
+            "custom_category": "",
+            "dependsOn": "typo3 => 6.2\n",
+            "disableLocalization": false,
+            "disableVersioning": false,
+            "sourceLanguage": "en",
+            "state": "alpha",
+            "targetVersion": "6.2",
+            "version": ""
+        },
+        "extensionKey": "custom_rest",
+        "name": "Custom REST extensions",
+        "originalExtensionKey": "",
+        "persons": [
+            {
+                "company": "",
+                "email": "info@cundd.net",
+                "name": "Daniel Corn",
+                "role": "Developer"
+            }
+        ],
+        "plugins": [
+
+        ],
+        "vendorName": "Cundd"
+    },
+    "wires": [
+
+    ],
+    "log": {
+        "last_modified": "2014-05-24 12:06",
+        "extension_builder_version": "6.2.0",
+        "be_user": "Daniel Corn (1)"
+    }
+}
