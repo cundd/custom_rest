@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="WEB_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$" />
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module-library">
+      <library name="PHP">
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/../cundd_composer/vendor" />
+          <root url="file://$MODULE_DIR$/../../../../rest" />
+          <root url="file://$MODULE_DIR$/../../../../../Resources/phpunit.phar" />
+          <root url="file://$MODULE_DIR$/../../../../../Resources/typo3_src-6.1.7/typo3/sysext/fluid" />
+          <root url="file://$MODULE_DIR$/../../../../../Resources/typo3_src-6.1.7/typo3/sysext/core" />
+          <root url="file://$MODULE_DIR$/../../../../../Resources/typo3_src-6.1.7/typo3/sysext/extbase" />
+        </CLASSES>
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/../cundd_composer/vendor" />
+          <root url="file://$MODULE_DIR$/../../../../rest" />
+          <root url="file://$MODULE_DIR$/../../../../../Resources/phpunit.phar" />
+          <root url="file://$MODULE_DIR$/../../../../../Resources/typo3_src-6.1.7/typo3/sysext/fluid" />
+          <root url="file://$MODULE_DIR$/../../../../../Resources/typo3_src-6.1.7/typo3/sysext/core" />
+          <root url="file://$MODULE_DIR$/../../../../../Resources/typo3_src-6.1.7/typo3/sysext/extbase" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="PHARS">
+        <CLASSES>
+          <root url="phar://$MODULE_DIR$/../../../../../Resources/phpunit.phar" />
+        </CLASSES>
+        <SOURCES>
+          <root url="phar://$MODULE_DIR$/../../../../../Resources/phpunit.phar" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+  </component>
+</module>
+
