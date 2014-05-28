@@ -1,6 +1,79 @@
 {
     "modules": [
+        {
+            "config": {
+                "position": [
+                    263,
+                    140
+                ]
+            },
+            "name": "New Model Object",
+            "value": {
+                "actionGroup": {
+                    "_default0_list": false,
+                    "_default1_show": false,
+                    "_default2_new_create": false,
+                    "_default3_edit_update": false,
+                    "_default4_delete": false,
+                    "customActions": [
 
+                    ]
+                },
+                "name": "Person",
+                "objectsettings": {
+                    "addDeletedField": true,
+                    "addHiddenField": true,
+                    "addStarttimeEndtimeFields": true,
+                    "aggregateRoot": true,
+                    "categorizable": false,
+                    "description": "Person",
+                    "mapToTable": "",
+                    "parentClass": "",
+                    "sorting": false,
+                    "type": "Entity",
+                    "uid": "434031327938"
+                },
+                "propertyGroup": {
+                    "properties": [
+                        {
+                            "allowedFileTypes": "",
+                            "maxItems": "1",
+                            "propertyDescription": "",
+                            "propertyIsExcludeField": true,
+                            "propertyIsRequired": false,
+                            "propertyName": "firstName",
+                            "propertyType": "String",
+                            "uid": "359730677318"
+                        },
+                        {
+                            "allowedFileTypes": "",
+                            "maxItems": "1",
+                            "propertyDescription": "",
+                            "propertyIsExcludeField": true,
+                            "propertyIsRequired": false,
+                            "propertyName": "lastName",
+                            "propertyType": "String",
+                            "uid": "891646962085"
+                        },
+                        {
+                            "allowedFileTypes": "",
+                            "maxItems": "1",
+                            "propertyDescription": "",
+                            "propertyIsExcludeField": true,
+                            "propertyIsRequired": false,
+                            "propertyName": "birthday",
+                            "propertyType": "NativeDate",
+                            "uid": "1157957836687"
+                        }
+                    ]
+                },
+                "relationGroup": {
+                    "relations": [
+
+                    ]
+                }
+            }
+        }
     ],
     "properties": {
         "backendModules": [
@@ -20,7 +93,7 @@
         },
         "extensionKey": "custom_rest",
         "name": "Custom REST extensions",
-        "originalExtensionKey": "",
+        "originalExtensionKey": "custom_rest",
         "persons": [
             {
                 "company": "",
@@ -38,7 +111,7 @@
 
     ],
     "log": {
-        "last_modified": "2014-05-24 12:06",
+        "last_modified": "2014-05-24 12:43",
         "extension_builder_version": "6.2.0",
         "be_user": "Daniel Corn (1)"
     }

@@ -30,8 +30,7 @@
  * Time: 21:55
  */
 
-namespace Cundd\CustomRest;
-
+namespace Cundd\CustomRest\Rest;
 
 
 use Bullet\App;
@@ -40,26 +39,11 @@ use Cundd\Rest\HandlerInterface;
 use Cundd\Rest\Request;
 
 /**
- * Handler for the credentials authorization
+ * Example handler
  *
  * @package Cundd\Rest\Handler
  */
 class Handler implements HandlerInterface {
-	/**
-	 * Status logged in
-	 */
-	const STATUS_LOGGED_IN = 'logged-in';
-
-	/**
-	 * Status logged out
-	 */
-	const STATUS_LOGGED_OUT = 'logged-out';
-
-	/**
-	 * Status failed login attempt
-	 */
-	const STATUS_FAILURE = 'login failure';
-
 	/**
 	 * Current request
 	 *
@@ -68,27 +52,13 @@ class Handler implements HandlerInterface {
 	protected $request;
 
 	/**
-	 * @var \Cundd\Rest\SessionManager
-	 * @inject
-	 */
-	protected $sessionManager;
-
-	/**
-	 * Provider that will check the user credentials
-	 *
-	 * @var \Cundd\Rest\Authentication\UserProviderInterface
-	 * @inject
-	 */
-	protected $userProvider;
-
-	/**
 	 * Sets the current request
 	 *
 	 * @param \Cundd\Rest\Request $request
 	 * @return $this
 	 */
 	public function setRequest($request) {
-		$this->request    = $request;
+		$this->request = $request;
 		return $this;
 	}
 
@@ -102,91 +72,49 @@ class Handler implements HandlerInterface {
 	}
 
 	/**
-	 * Returns the current status
-	 *
-	 * @return array
-	 */
-	public function getStatus() {
-		$loginStatus = $this->sessionManager->valueForKey('loginStatus');
-		if ($loginStatus === NULL) {
-			$loginStatus = self::STATUS_LOGGED_OUT;
-		}
-		return array(
-			'status' => $loginStatus
-		);
-	}
-
-	/**
-	 * Check the given login data
-	 *
-	 * @param array $sentData
-	 * @return array
-	 */
-	public function checkLogin($sentData) {
-		$loginStatus = self::STATUS_LOGGED_OUT;
-		if (isset($sentData['username']) && isset($sentData['apikey'])) {
-			$username = $sentData['username'];
-			$apikey = $sentData['apikey'];
-
-			if ($this->userProvider->checkCredentials($username, $apikey)) {
-				$loginStatus = self::STATUS_LOGGED_IN;
-			} else {
-				$loginStatus = self::STATUS_FAILURE;
-			}
-			$this->sessionManager->setValueForKey('loginStatus', $loginStatus);
-		}
-		return array(
-			'status' => $loginStatus
-		);
-	}
-
-	/**
-	 * Log out
-	 *
-	 * @return array
-	 */
-	public function logout() {
-		$this->sessionManager->setValueForKey('loginStatus', self::STATUS_LOGGED_OUT);
-		return array(
-			'status' => self::STATUS_LOGGED_OUT
-		);
-	}
-
-	/**
 	 * Configure the API paths
 	 */
 	public function configureApiPaths() {
 		$dispatcher = Dispatcher::getSharedDispatcher();
 
-		echo 'bbb';
-
 		/** @var App $app */
 		$app = $dispatcher->getApp();
 
-		/** @var AuthHandler */
+		/** @var Handler */
 		$handler = $this;
 
-		$app->path($dispatcher->getPath(), function ($request) use ($handler, $app) {
+		$app->path($dispatcher->getPath(), function ($request) use ($handler, $app, $dispatcher) {
 			$handler->setRequest($request);
 
-			$app->path('login', function($request) use ($handler, $app) {
-				$getCallback = function ($request) use ($handler) {
-					return $handler->getStatus();
+
+			$app->path('subpath', function ($request) use ($handler, $app, $dispatcher) {
+				# curl -X GET http://localhost:8888/rest/customhandler/subpath
+				$getCallback = function ($request) use ($handler, $dispatcher) {
+					return array(
+						'path' => $dispatcher->getPath(),
+						'uri'  => $dispatcher->getUri(),
+					);
 				};
 				$app->get($getCallback);
 
-				$loginCallback = function ($request) use ($handler) {
+				# curl -X POST -d '{"username":"johndoe","password":"123456"}' http://localhost:8888/rest/customhandler/subpath
+				$postCallback = function ($request) use ($handler) {
 					$dispatcher = Dispatcher::getSharedDispatcher();
-					return $handler->checkLogin($dispatcher->getSentData());
+					return array(
+						'path' => $dispatcher->getPath(),
+						'uri'  => $dispatcher->getUri(),
+						'data' => $dispatcher->getSentData(),
+					);
 				};
-				$app->post($loginCallback);
+				$app->post($postCallback);
 			});
 
-			$app->path('logout', function($request) use ($handler, $app) {
-				$getCallback = function ($request) use ($handler) {
-					return $handler->logout();
-				};
-				$app->get($getCallback);
+			# curl -X GET http://localhost:8888/rest/customhandler
+			$app->get(function ($request) use ($dispatcher) {
+				return array(
+					'path' => $dispatcher->getPath(),
+					'uri'  => $dispatcher->getUri(),
+				);
 			});
 		});
 	}

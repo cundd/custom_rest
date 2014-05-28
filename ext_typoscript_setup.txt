@@ -1,0 +1,12 @@
+plugin.tx_rest.settings.paths {
+	400 {
+		path = cundd-custom_rest-*
+
+		read = allow
+		write = allow
+	}
+}
+
+plugin.tx_rest.settings.aliases {
+	customhandler = cundd-custom_rest-custom_handler
+}
