@@ -86,9 +86,16 @@ class Handler implements HandlerInterface {
 		$app->path($dispatcher->getPath(), function ($request) use ($handler, $app, $dispatcher) {
 			$handler->setRequest($request);
 
+			# curl -X GET http://your-domain.com/rest/customhandler
+			$app->get(function ($request) use ($dispatcher) {
+				return array(
+					'path' => $dispatcher->getPath(),
+					'uri'  => $dispatcher->getUri(),
+				);
+			});
 
 			$app->path('subpath', function ($request) use ($handler, $app, $dispatcher) {
-				# curl -X GET http://localhost:8888/rest/customhandler/subpath
+				# curl -X GET http://your-domain.com/rest/customhandler/subpath
 				$getCallback = function ($request) use ($handler, $dispatcher) {
 					return array(
 						'path' => $dispatcher->getPath(),
@@ -97,7 +104,7 @@ class Handler implements HandlerInterface {
 				};
 				$app->get($getCallback);
 
-				# curl -X POST -d '{"username":"johndoe","password":"123456"}' http://localhost:8888/rest/customhandler/subpath
+				# curl -X POST -d '{"username":"johndoe","password":"123456"}' http://your-domain.com/rest/customhandler/subpath
 				$postCallback = function ($request) use ($handler) {
 					$dispatcher = Dispatcher::getSharedDispatcher();
 					return array(
@@ -107,14 +114,6 @@ class Handler implements HandlerInterface {
 					);
 				};
 				$app->post($postCallback);
-			});
-
-			# curl -X GET http://localhost:8888/rest/customhandler
-			$app->get(function ($request) use ($dispatcher) {
-				return array(
-					'path' => $dispatcher->getPath(),
-					'uri'  => $dispatcher->getUri(),
-				);
 			});
 		});
 	}
