@@ -77,43 +77,42 @@ class Handler implements HandlerInterface {
 	public function configureApiPaths() {
 		$dispatcher = Dispatcher::getSharedDispatcher();
 
-		/** @var App $app */
-		$app = $dispatcher->getApp();
-
 		/** @var Handler */
 		$handler = $this;
 
-		$app->path($dispatcher->getPath(), function ($request) use ($handler, $app, $dispatcher) {
+		$dispatcher->registerPath($dispatcher->getRequest()->path(), function ($request) use ($handler, $dispatcher) {
 			$handler->setRequest($request);
 
 			# curl -X GET http://your-domain.com/rest/customhandler
-			$app->get(function ($request) use ($dispatcher) {
+			$dispatcher->registerGetMethod(function ($request) use ($dispatcher) {
+				/** @var Request $request */
 				return array(
-					'path' => $dispatcher->getPath(),
-					'uri'  => $dispatcher->getUri(),
+					'path' => $request->path(),
+					'uri'  => $request->uri(),
 				);
 			});
 
-			$app->path('subpath', function ($request) use ($handler, $app, $dispatcher) {
+			$dispatcher->registerPath('subpath', function ($request) use ($handler, $dispatcher) {
 				# curl -X GET http://your-domain.com/rest/customhandler/subpath
 				$getCallback = function ($request) use ($handler, $dispatcher) {
+					/** @var Request $request */
 					return array(
-						'path' => $dispatcher->getPath(),
-						'uri'  => $dispatcher->getUri(),
+						'path' => $request->path(),
+						'uri'  => $request->uri(),
 					);
 				};
-				$app->get($getCallback);
+				$dispatcher->registerGetMethod($getCallback);
 
 				# curl -X POST -d '{"username":"johndoe","password":"123456"}' http://your-domain.com/rest/customhandler/subpath
 				$postCallback = function ($request) use ($handler) {
-					$dispatcher = Dispatcher::getSharedDispatcher();
+					/** @var Request $request */
 					return array(
-						'path' => $dispatcher->getPath(),
-						'uri'  => $dispatcher->getUri(),
-						'data' => $dispatcher->getSentData(),
+						'path' => $request->path(),
+						'uri'  => $request->uri(),
+						'data' => $request->getSentData(),
 					);
 				};
-				$app->post($postCallback);
+				$dispatcher->registerPostMethod($postCallback);
 			});
 		});
 	}
