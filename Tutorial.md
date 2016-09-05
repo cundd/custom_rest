@@ -3,33 +3,7 @@
 As described in the [Tutorial](https://rest.cundd.net/Tutorial/), the TYPO3 rest extension can be used as a boilerplate for your own Web Services. If you have a extbase Plugin you want to use, it can be called easily through a custom handler. To make things more convenient, a small helper function in your Handler is useful:
 
 ```php
-protected function callExtbasePlugin($pluginName, $vendorName, $extensionName, $controllerName, $actionName, $arguments) {
-
-    $pluginNamespace = strtolower('tx_'. $extensionName . '_' . $pluginName);
-	
-    $_POST[$pluginNamespace]['controller'] = $controllerName;
-    $_POST[$pluginNamespace]['action'] = $actionName;
-       
-    $keys = array_keys($arguments);
-    foreach ($keys as $key) {
-        $_POST[$pluginNamespace][$key] = $arguments[$key];
-    }
-    
-    $configuration = [
-        'extensionName' => $extensionName,
-        'pluginName' => $pluginName
-    ];
-       
-    if (!empty($vendorName)) {
-        $configuration['vendorName'] = $vendorName;
-    }
-       
-    $bootstrap = $this->objectManager->get(\TYPO3\CMS\Extbase\Core\Bootstrap::class);
-    
-	$response = $bootstrap->run('', $configuration);
-       
-	return $response;
-}
+protected function callExtbasePlugin($pluginName, $vendorName, $extensionName, $controllerName, $actionName, $arguments) { ... }
 ```
 File: Handler.php
 
