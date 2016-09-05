@@ -23,4 +23,4 @@ Things needed:
 * configure you plugin in the ext_localconf.php File
 * call it in your custom Handler
 
-This fork has made the proper adjustments to show how to do it.
+This fork has the proper adjustments to show how to do it. (untested)
