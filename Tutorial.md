@@ -15,3 +15,12 @@ Before using this function, some things have to be mentioned:
 ## Example
 
 Lets say we want to create specific domain objects with a custom validation using a web service api.
+
+Things needed:
+
+* a Controller with the specific action method
+* the (custom) validator for your model (if extbase finds a validator named \YourVendor\YourExt\Domain\Validator\YourModelValidator, it will validate against it, otherwise the validator has to be configured explicitely with a '@validate' annotation (see [Validating Domain Objects](https://docs.typo3.org/typo3cms/ExtbaseFluidBook/9-CrosscuttingConcerns/2-validating-domain-objects.html)) 
+* configure you plugin in the ext_localconf.php File
+* call it in your custom Handler
+
+This fork has made the proper adjustments to show how to do it.
