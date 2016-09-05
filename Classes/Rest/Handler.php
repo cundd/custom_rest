@@ -114,6 +114,17 @@ class Handler implements HandlerInterface {
 				};
 				$dispatcher->registerPostMethod($postCallback);
 			});
+			
+			$dispatcher->registerPath('create', function ($request) use ($handler, $dispatcher) {
+				# curl -X POST -d '{"username":"johndoe","password":"123456"}' http://your-domain.com/rest/customhandler/subpath
+				$postCallback = function ($request) use ($handler) {
+					$arguments = [
+						'user' => $request->getSentData()
+					];
+					return $handler->callExtbasePlugin('myPlugin', 'Cundd', 'CustomRest', 'Example', 'create', $arguments);
+				};
+				$dispatcher->registerPostMethod($postCallback);
+			});
 		});
 	}
 	
