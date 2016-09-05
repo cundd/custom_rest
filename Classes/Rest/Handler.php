@@ -116,7 +116,7 @@ class Handler implements HandlerInterface {
 			});
 			
 			$dispatcher->registerPath('create', function ($request) use ($handler, $dispatcher) {
-				# curl -X POST -d '{"username":"johndoe","password":"123456"}' http://your-domain.com/rest/customhandler/subpath
+				# curl -X POST -d '{"firstName":"john","lastName":"doe"}' http://your-domain.com/rest/customhandler/subpath
 				$postCallback = function ($request) use ($handler) {
 					$arguments = [
 						'user' => $request->getSentData()
