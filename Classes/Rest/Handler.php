@@ -51,6 +51,12 @@ class Handler implements HandlerInterface {
 	 */
 	protected $request;
 
+    /**
+     * @var \Cundd\Rest\ObjectManagerInterface
+     * @inject
+     */
+    protected $objectManager;
+
 	/**
 	 * Sets the current request
 	 *
@@ -116,10 +122,10 @@ class Handler implements HandlerInterface {
 			});
 			
 			$dispatcher->registerPath('create', function ($request) use ($handler, $dispatcher) {
-				# curl -X POST -d '{"firstName":"john","lastName":"doe"}' http://your-domain.com/rest/customhandler/subpath
+				# curl -X POST -H "Content-Type: application/json" -d '{"firstName":"john","lastName":"john"}' http://localhost:8888/rest/customhandler/create
 				$postCallback = function ($request) use ($handler) {
 					$arguments = [
-						'user' => $request->getSentData()
+						'person' => $request->getSentData()
 					];
 					return $handler->callExtbasePlugin('myPlugin', 'Cundd', 'CustomRest', 'Example', 'create', $arguments);
 				};
@@ -127,18 +133,18 @@ class Handler implements HandlerInterface {
 			});
 		});
 	}
-	
-	/**
-	 * calls a extbase plugin
-	 * 
-	 * @param string $pluginName the name of the plugin like configured in ext_localconf.php
-	 * @param string $vendorName the name of the vendor (if no vendor use '')
-	 * @param string $extensionName the name of the extension
-	 * @param string $actionName the name of the action to call
-	 * @param array $arguments the arguments to pass to the action
-	 *
-	 * @return string
-	 */
+
+    /**
+     * calls a extbase plugin
+     *
+     * @param string $pluginName the name of the plugin like configured in ext_localconf.php
+     * @param string $vendorName the name of the vendor (if no vendor use '')
+     * @param string $extensionName the name of the extension
+     * @param string $controllerName the name of the controller
+     * @param string $actionName the name of the action to call
+     * @param array $arguments the arguments to pass to the action
+     * @return string
+     */
 	protected function callExtbasePlugin($pluginName, $vendorName, $extensionName, $controllerName, $actionName, $arguments) {
 	
 		$pluginNamespace = strtolower('tx_'. $extensionName . '_' . $pluginName);
