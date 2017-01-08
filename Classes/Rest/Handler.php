@@ -33,23 +33,25 @@
 namespace Cundd\CustomRest\Rest;
 
 
-use Bullet\App;
-use Cundd\Rest\Dispatcher;
 use Cundd\Rest\HandlerInterface;
+use Cundd\Rest\Http\RestRequestInterface;
 use Cundd\Rest\Request;
+use Cundd\Rest\Router\Route;
+use Cundd\Rest\Router\RouterInterface;
 
 /**
  * Example handler
  *
  * @package Cundd\Rest\Handler
  */
-class Handler implements HandlerInterface {
-	/**
-	 * Current request
-	 *
-	 * @var Request
-	 */
-	protected $request;
+class Handler implements HandlerInterface
+{
+    /**
+     * Current request
+     *
+     * @var Request
+     */
+    protected $request;
 
     /**
      * @var \Cundd\Rest\ObjectManagerInterface
@@ -57,119 +59,122 @@ class Handler implements HandlerInterface {
      */
     protected $objectManager;
 
-	/**
-	 * Sets the current request
-	 *
-	 * @param \Cundd\Rest\Request $request
-	 * @return $this
-	 */
-	public function setRequest($request) {
-		$this->request = $request;
-		return $this;
-	}
+    /**
+     * Sets the current request
+     *
+     * @param RestRequestInterface $request
+     * @return $this
+     */
+    public function setRequest(RestRequestInterface $request)
+    {
+        $this->request = $request;
 
-	/**
-	 * Returns the current request
-	 *
-	 * @return \Cundd\Rest\Request
-	 */
-	public function getRequest() {
-		return $this->request;
-	}
+        return $this;
+    }
 
-	/**
-	 * Configure the API paths
-	 */
-	public function configureApiPaths() {
-		$dispatcher = Dispatcher::getSharedDispatcher();
+    /**
+     * Returns the current request
+     *
+     * @return \Cundd\Rest\Request
+     */
+    public function getRequest()
+    {
+        return $this->request;
+    }
 
-		/** @var Handler */
-		$handler = $this;
+    /**
+     * @inheritDoc
+     */
+    public function configureRoutes(RouterInterface $router, RestRequestInterface $request)
+    {
+        # curl -X GET http://localhost:8888/rest/customhandler/
+        $router->add(Route::get($request->getResourceType(), function (RestRequestInterface $request) {
+            return array(
+                'path'         => $request->getPath(),
+                'uri'          => (string)$request->getUri(),
+                'resourceType' => (string)$request->getResourceType(),
+            );
+        }));
 
-		$dispatcher->registerPath($dispatcher->getRequest()->path(), function ($request) use ($handler, $dispatcher) {
-			$handler->setRequest($request);
+        # curl -X GET http://localhost:8888/rest/customhandler/subpath
+        $router->add(Route::get($request->getResourceType(). '/subpath', function (RestRequestInterface $request) {
+            return array(
+                'path'         => $request->getPath(),
+                'uri'          => (string)$request->getUri(),
+                'resourceType' => (string)$request->getResourceType(),
+            );
+        }));
 
-			# curl -X GET http://your-domain.com/rest/customhandler
-			$dispatcher->registerGetMethod(function ($request) use ($dispatcher) {
-				/** @var Request $request */
-				return array(
-					'path' => $request->path(),
-					'uri'  => $request->uri(),
-				);
-			});
+        # curl -X POST -d '{"username":"johndoe","password":"123456"}' http://localhost:8888/rest/customhandler/subpath
+        $router->add(Route::post($request->getResourceType(). '/subpath', function (RestRequestInterface $request) {
+            return array(
+                'path'         => $request->getPath(),
+                'uri'          => (string)$request->getUri(),
+                'resourceType' => (string)$request->getResourceType(),
+                'data'         => $request->getSentData(),
+            );
+        }));
 
-			$dispatcher->registerPath('subpath', function ($request) use ($handler, $dispatcher) {
-				# curl -X GET http://your-domain.com/rest/customhandler/subpath
-				$getCallback = function ($request) use ($handler, $dispatcher) {
-					/** @var Request $request */
-					return array(
-						'path' => $request->path(),
-						'uri'  => $request->uri(),
-					);
-				};
-				$dispatcher->registerGetMethod($getCallback);
+        # curl -X POST -H "Content-Type: application/json" -d '{"firstName":"john","lastName":"john"}' http://localhost:8888/rest/customhandler/create
+        $router->add(Route::post($request->getResourceType(). '/create', function (RestRequestInterface $request) {
+            /** @var Request $request */
+            $arguments = [
+                'person' => $request->getSentData(),
+            ];
 
-				# curl -X POST -d '{"username":"johndoe","password":"123456"}' http://your-domain.com/rest/customhandler/subpath
-				$postCallback = function ($request) use ($handler) {
-					/** @var Request $request */
-					return array(
-						'path' => $request->path(),
-						'uri'  => $request->uri(),
-						'data' => $request->getSentData(),
-					);
-				};
-				$dispatcher->registerPostMethod($postCallback);
-			});
-			
-			$dispatcher->registerPath('create', function ($request) use ($handler, $dispatcher) {
-				# curl -X POST -H "Content-Type: application/json" -d '{"firstName":"john","lastName":"john"}' http://localhost:8888/rest/customhandler/create
-				$postCallback = function ($request) use ($handler) {
-					$arguments = [
-						'person' => $request->getSentData()
-					];
-					return $handler->callExtbasePlugin('myPlugin', 'Cundd', 'CustomRest', 'Example', 'create', $arguments);
-				};
-				$dispatcher->registerPostMethod($postCallback);
-			});
-		});
-	}
+            return $this->callExtbasePlugin(
+                'myPlugin',
+                'Cundd',
+                'CustomRest',
+                'Example',
+                'create',
+                $arguments
+            );
+        }));
+    }
 
     /**
      * calls a extbase plugin
      *
-     * @param string $pluginName the name of the plugin like configured in ext_localconf.php
-     * @param string $vendorName the name of the vendor (if no vendor use '')
-     * @param string $extensionName the name of the extension
+     * @param string $pluginName     the name of the plugin like configured in ext_localconf.php
+     * @param string $vendorName     the name of the vendor (if no vendor use '')
+     * @param string $extensionName  the name of the extension
      * @param string $controllerName the name of the controller
-     * @param string $actionName the name of the action to call
-     * @param array $arguments the arguments to pass to the action
+     * @param string $actionName     the name of the action to call
+     * @param array  $arguments      the arguments to pass to the action
      * @return string
      */
-	protected function callExtbasePlugin($pluginName, $vendorName, $extensionName, $controllerName, $actionName, $arguments) {
-	
-		$pluginNamespace = strtolower('tx_'. $extensionName . '_' . $pluginName);
-		
-		$_POST[$pluginNamespace]['controller'] = $controllerName;
-		$_POST[$pluginNamespace]['action'] = $actionName;
-	       
-		$keys = array_keys($arguments);
-		foreach ($keys as $key) {
-			$_POST[$pluginNamespace][$key] = $arguments[$key];
-		}
-	    
-		$configuration = [
-			'extensionName' => $extensionName,
-			'pluginName' => $pluginName
-		];
-	       
-		if (!empty($vendorName)) {
-			$configuration['vendorName'] = $vendorName;
-		}
-	       
-		$bootstrap = $this->objectManager->get(\TYPO3\CMS\Extbase\Core\Bootstrap::class);
-	    
-		$response = $bootstrap->run('', $configuration);
-	       
-		return $response;
-	}
+    protected function callExtbasePlugin(
+        $pluginName,
+        $vendorName,
+        $extensionName,
+        $controllerName,
+        $actionName,
+        $arguments
+    ) {
+        $pluginNamespace = strtolower('tx_' . $extensionName . '_' . $pluginName);
+
+        $_POST[$pluginNamespace]['controller'] = $controllerName;
+        $_POST[$pluginNamespace]['action'] = $actionName;
+
+        $keys = array_keys($arguments);
+        foreach ($keys as $key) {
+            $_POST[$pluginNamespace][$key] = $arguments[$key];
+        }
+
+        $configuration = [
+            'extensionName' => $extensionName,
+            'pluginName'    => $pluginName,
+        ];
+
+        if (!empty($vendorName)) {
+            $configuration['vendorName'] = $vendorName;
+        }
+
+        $bootstrap = $this->objectManager->get(\TYPO3\CMS\Extbase\Core\Bootstrap::class);
+
+        $response = $bootstrap->run('', $configuration);
+
+        return $response;
+    }
 }
