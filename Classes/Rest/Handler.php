@@ -33,7 +33,7 @@
 namespace Cundd\CustomRest\Rest;
 
 
-use Cundd\Rest\HandlerInterface;
+use Cundd\Rest\Handler\HandlerInterface;
 use Cundd\Rest\Http\RestRequestInterface;
 use Cundd\Rest\Request;
 use Cundd\Rest\Router\Route;
@@ -47,40 +47,16 @@ use Cundd\Rest\Router\RouterInterface;
 class Handler implements HandlerInterface
 {
     /**
-     * Current request
-     *
-     * @var Request
-     */
-    protected $request;
-
-    /**
      * @var \Cundd\Rest\ObjectManagerInterface
      * @inject
      */
     protected $objectManager;
 
     /**
-     * Sets the current request
-     *
-     * @param RestRequestInterface $request
-     * @return $this
+     * @var \Cundd\Rest\ResponseFactoryInterface
+     * @inject
      */
-    public function setRequest(RestRequestInterface $request)
-    {
-        $this->request = $request;
-
-        return $this;
-    }
-
-    /**
-     * Returns the current request
-     *
-     * @return \Cundd\Rest\Request
-     */
-    public function getRequest()
-    {
-        return $this->request;
-    }
+    protected $responseFactory;
 
     /**
      * @inheritDoc
@@ -88,49 +64,78 @@ class Handler implements HandlerInterface
     public function configureRoutes(RouterInterface $router, RestRequestInterface $request)
     {
         # curl -X GET http://localhost:8888/rest/customhandler/
-        $router->add(Route::get($request->getResourceType(), function (RestRequestInterface $request) {
-            return array(
-                'path'         => $request->getPath(),
-                'uri'          => (string)$request->getUri(),
-                'resourceType' => (string)$request->getResourceType(),
-            );
-        }));
+        $router->add(
+            Route::get(
+                $request->getResourceType(),
+                function (RestRequestInterface $request) {
+                    return array(
+                        'path'         => $request->getPath(),
+                        'uri'          => (string)$request->getUri(),
+                        'resourceType' => (string)$request->getResourceType(),
+                    );
+                }
+            )
+        );
+        # curl -X GET http://localhost:8888/rest/cundd-custom_rest-require/
+        $router->add(
+            Route::get(
+                'cundd-custom_rest-require',
+                function () {
+                    return 'Access Granted';
+                }
+            )
+        );
 
         # curl -X GET http://localhost:8888/rest/customhandler/subpath
-        $router->add(Route::get($request->getResourceType(). '/subpath', function (RestRequestInterface $request) {
-            return array(
-                'path'         => $request->getPath(),
-                'uri'          => (string)$request->getUri(),
-                'resourceType' => (string)$request->getResourceType(),
-            );
-        }));
+        $router->add(
+            Route::get(
+                $request->getResourceType() . '/subpath',
+                function (RestRequestInterface $request) {
+                    return array(
+                        'path'         => $request->getPath(),
+                        'uri'          => (string)$request->getUri(),
+                        'resourceType' => (string)$request->getResourceType(),
+                    );
+                }
+            )
+        );
 
         # curl -X POST -d '{"username":"johndoe","password":"123456"}' http://localhost:8888/rest/customhandler/subpath
-        $router->add(Route::post($request->getResourceType(). '/subpath', function (RestRequestInterface $request) {
-            return array(
-                'path'         => $request->getPath(),
-                'uri'          => (string)$request->getUri(),
-                'resourceType' => (string)$request->getResourceType(),
-                'data'         => $request->getSentData(),
-            );
-        }));
+        $router->add(
+            Route::post(
+                $request->getResourceType() . '/subpath',
+                function (RestRequestInterface $request) {
+                    return array(
+                        'path'         => $request->getPath(),
+                        'uri'          => (string)$request->getUri(),
+                        'resourceType' => (string)$request->getResourceType(),
+                        'data'         => $request->getSentData(),
+                    );
+                }
+            )
+        );
 
         # curl -X POST -H "Content-Type: application/json" -d '{"firstName":"john","lastName":"john"}' http://localhost:8888/rest/customhandler/create
-        $router->add(Route::post($request->getResourceType(). '/create', function (RestRequestInterface $request) {
-            /** @var Request $request */
-            $arguments = [
-                'person' => $request->getSentData(),
-            ];
+        $router->add(
+            Route::post(
+                $request->getResourceType() . '/create',
+                function (RestRequestInterface $request) {
+                    /** @var Request $request */
+                    $arguments = [
+                        'person' => $request->getSentData(),
+                    ];
 
-            return $this->callExtbasePlugin(
-                'myPlugin',
-                'Cundd',
-                'CustomRest',
-                'Example',
-                'create',
-                $arguments
-            );
-        }));
+                    return $this->callExtbasePlugin(
+                        'myPlugin',
+                        'Cundd',
+                        'CustomRest',
+                        'Example',
+                        'create',
+                        $arguments
+                    );
+                }
+            )
+        );
     }
 
     /**
@@ -175,6 +180,6 @@ class Handler implements HandlerInterface
 
         $response = $bootstrap->run('', $configuration);
 
-        return $response;
+        return $this->responseFactory->createResponse($response, 200);
     }
 }
