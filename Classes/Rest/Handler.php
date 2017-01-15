@@ -135,7 +135,7 @@ class Handler implements HandlerInterface
         # curl -X GET http://localhost:8888/rest/customhandler/decimal/10.8/
         $router->add(
             Route::get(
-                $request->getResourceType() . '/decimal/{float}/',
+                $request->getResourceType() . '/decimal/{float}',
                 function (RestRequestInterface $request, $parameter) {
                     return array(
                         'value'         => $parameter,
