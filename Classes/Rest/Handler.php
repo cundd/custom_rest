@@ -76,6 +76,7 @@ class Handler implements HandlerInterface
                 }
             )
         );
+
         # curl -X GET http://localhost:8888/rest/cundd-custom_rest-require/
         $router->add(
             Route::get(
@@ -95,6 +96,70 @@ class Handler implements HandlerInterface
                         'path'         => $request->getPath(),
                         'uri'          => (string)$request->getUri(),
                         'resourceType' => (string)$request->getResourceType(),
+                    );
+                }
+            )
+        );
+
+        # curl -X GET http://localhost:8888/rest/customhandler/parameter/slug
+        $router->add(
+            Route::get(
+                $request->getResourceType() . '/parameter/{slug}',
+                function (RestRequestInterface $request, $slug) {
+                    return array(
+                        'slug'         => $slug,
+                        'path'         => $request->getPath(),
+                        'uri'          => (string)$request->getUri(),
+                        'resourceType' => (string)$request->getResourceType(),
+                    );
+                }
+            )
+        );
+
+        # curl -X GET http://localhost:8888/rest/customhandler/12
+        $router->add(
+            Route::get(
+                $request->getResourceType() . '/{int}',
+                function (RestRequestInterface $request, $parameter) {
+                    return array(
+                        'value'         => $parameter,
+                        'parameterType' => gettype($parameter),
+                        'path'          => $request->getPath(),
+                        'uri'           => (string)$request->getUri(),
+                        'resourceType'  => (string)$request->getResourceType(),
+                    );
+                }
+            )
+        );
+
+        # curl -X GET http://localhost:8888/rest/customhandler/decimal/10.8/
+        $router->add(
+            Route::get(
+                $request->getResourceType() . '/decimal/{float}/',
+                function (RestRequestInterface $request, $parameter) {
+                    return array(
+                        'value'         => $parameter,
+                        'parameterType' => gettype($parameter),
+                        'path'          => $request->getPath(),
+                        'uri'           => (string)$request->getUri(),
+                        'resourceType'  => (string)$request->getResourceType(),
+                    );
+                }
+            )
+        );
+
+        # curl -X GET http://localhost:8888/rest/customhandler/bool/yes
+        # curl -X GET http://localhost:8888/rest/customhandler/bool/no
+        $router->add(
+            Route::get(
+                $request->getResourceType() . '/bool/{bool}',
+                function (RestRequestInterface $request, $parameter) {
+                    return array(
+                        'value'         => $parameter,
+                        'parameterType' => gettype($parameter),
+                        'path'          => $request->getPath(),
+                        'uri'           => (string)$request->getUri(),
+                        'resourceType'  => (string)$request->getResourceType(),
                     );
                 }
             )
