@@ -10,3 +10,7 @@ plugin.tx_rest.settings.paths {
 plugin.tx_rest.settings.aliases {
     customhandler = cundd-custom_rest-custom_handler
 }
+
+### Either you can specify a valid cHash for your requests or disable `features.requireCHashArgumentForActionArguments`
+# see: https://docs.typo3.org/typo3cms/extensions/core/8-dev/Changelog/8.5/Breaking-78002-EnforceCHashArgumentForExtbaseActions.html
+plugin.tx_customrest.features.requireCHashArgumentForActionArguments = 0
