@@ -241,6 +241,7 @@ class Handler implements HandlerInterface
             $configuration['vendorName'] = $vendorName;
         }
 
+        /** @var \TYPO3\CMS\Extbase\Core\Bootstrap $bootstrap */
         $bootstrap = $this->objectManager->get(\TYPO3\CMS\Extbase\Core\Bootstrap::class);
 
         $response = $bootstrap->run('', $configuration);
