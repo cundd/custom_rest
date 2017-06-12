@@ -63,7 +63,7 @@ class Handler implements HandlerInterface
      */
     public function configureRoutes(RouterInterface $router, RestRequestInterface $request)
     {
-        # curl -X GET http://localhost:8888/rest/customhandler/
+        # curl -X GET http://localhost:8888/rest/customhandler
         $router->add(
             Route::get(
                 $request->getResourceType(),
@@ -77,7 +77,7 @@ class Handler implements HandlerInterface
             )
         );
 
-        # curl -X GET http://localhost:8888/rest/cundd-custom_rest-require/
+        # curl -X GET http://localhost:8888/rest/cundd-custom_rest-require
         $router->add(
             Route::get(
                 'cundd-custom_rest-require',
@@ -132,7 +132,7 @@ class Handler implements HandlerInterface
             )
         );
 
-        # curl -X GET http://localhost:8888/rest/customhandler/decimal/10.8/
+        # curl -X GET http://localhost:8888/rest/customhandler/decimal/10.8
         $router->add(
             Route::get(
                 $request->getResourceType() . '/decimal/{float}',
