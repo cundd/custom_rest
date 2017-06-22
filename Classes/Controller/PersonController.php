@@ -2,17 +2,15 @@
 
 namespace Cundd\CustomRest\Controller;
 
-/**
- * Person Controller
- *
- * @package custom_rest
- */
-
 use \Cundd\CustomRest\Domain\Model\Person;
+use TYPO3\CMS\Extbase\Mvc\Controller\MvcPropertyMappingConfiguration;
 use \TYPO3\CMS\Extbase\Property\PropertyMappingConfigurationBuilder;
 use \TYPO3\CMS\Extbase\Property\TypeConverter\PersistentObjectConverter;
 use \TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 
+/**
+ * An example Extbase controller that will be called through REST
+ */
 class PersonController extends ActionController
 {
     /**
@@ -141,8 +139,9 @@ class PersonController extends ActionController
     protected function addPropertyMappingConfiguration()
     {
         if ($this->request->hasArgument('person')) {
+            /** @var MvcPropertyMappingConfiguration $propertyMappingConfiguration */
             $propertyMappingConfiguration = (new PropertyMappingConfigurationBuilder())->build(
-                'TYPO3\\CMS\\Extbase\\Mvc\\Controller\\MvcPropertyMappingConfiguration'
+                MvcPropertyMappingConfiguration::class
             );
             $propertyMappingConfiguration->setTypeConverterOption(
                 PersistentObjectConverter::class,
@@ -150,7 +149,7 @@ class PersonController extends ActionController
                 true
             );
 
-            foreach ($this->request->getArgument('person') as $propertyName => $value) {
+            foreach ((array)$this->request->getArgument('person') as $propertyName => $value) {
                 $propertyMappingConfiguration->allowProperties($propertyName);
             }
 
