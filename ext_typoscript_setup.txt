@@ -5,6 +5,12 @@ plugin.tx_rest.settings.paths {
         read = allow
         write = allow
     }
+
+    cundd-custom_rest-require {
+        path = cundd-custom_rest-require
+        read = require
+        write = require
+    }
 }
 
 plugin.tx_rest.settings.aliases {

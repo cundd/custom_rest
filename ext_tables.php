@@ -5,8 +5,8 @@ if (!defined('TYPO3_MODE')) {
 
 \TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerPlugin(
     'Cundd.'.$_EXTKEY,
-    'myPlugin',
-    'myPlugin - List '
+    'customRest',
+    'CustomRest - List '
 );
 
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addLLrefForTCAdescr('tx_customrest_domain_model_person', 'EXT:custom_rest/Resources/Private/Language/locallang_csh_tx_customrest_domain_model_person.xlf');

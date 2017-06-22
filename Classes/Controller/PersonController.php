@@ -2,33 +2,8 @@
 
 namespace Cundd\CustomRest\Controller;
 
-    /***************************************************************
-     *  Copyright notice
-     *
-     *  (c) 2016 Ben Walch <walch.ben@gmx.at>
-     *
-     *  All rights reserved
-     *
-     *  This script is part of the TYPO3 project. The TYPO3 project is
-     *  free software; you can redistribute it and/or modify
-     *  it under the terms of the GNU General Public License as published by
-     *  the Free Software Foundation; either version 3 of the License, or
-     *  (at your option) any later version.
-     *
-     *  The GNU General Public License can be found at
-     *  http://www.gnu.org/copyleft/gpl.html.
-     *
-     *  This script is distributed in the hope that it will be useful,
-     *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-     *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-     *  GNU General Public License for more details.
-     *
-     *  This copyright notice MUST APPEAR in all copies of the script!
-     ***************************************************************/
-
-
 /**
- * Example Controller
+ * Person Controller
  *
  * @package custom_rest
  */
@@ -36,10 +11,10 @@ namespace Cundd\CustomRest\Controller;
 use \Cundd\CustomRest\Domain\Model\Person;
 use \TYPO3\CMS\Extbase\Property\PropertyMappingConfigurationBuilder;
 use \TYPO3\CMS\Extbase\Property\TypeConverter\PersistentObjectConverter;
+use \TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 
-class ExampleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
+class PersonController extends ActionController
 {
-
     /**
      * @var \TYPO3\CMS\Extbase\Mvc\View\JsonView
      */
@@ -57,6 +32,66 @@ class ExampleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
      * @inject
      */
     protected $personRepository;
+
+
+    /* ----------------- GET -------------*/
+
+    /**
+     * action list
+     *
+     * @return void
+     */
+    public function listAction()
+    {
+        $this->view->assign('value', $this->personRepository->findAll());
+    }
+
+    /**
+     * action show
+     *
+     * @param integer $uid
+     * @return void
+     */
+    public function showAction($uid)
+    {
+        $this->view->assign('value', $this->personRepository->findByUid($uid));
+    }
+
+    /**
+     * action firstName
+     *
+     * @param string $firstName
+     * @return void
+     */
+    public function firstNameAction($firstName)
+    {
+        $this->view->assign('value', $this->personRepository->findByFirstName($firstName));
+    }
+
+    /**
+     * action lastName
+     *
+     * @param string $lastName
+     * @return void
+     */
+    public function lastNameAction($lastName)
+    {
+        $this->view->assign('value', $this->personRepository->findByLastName($lastName));
+    }
+
+    /**
+     * action birthday
+     *
+     * @param string $date
+     * @return void
+     */
+    public function birthdayAction($date)
+    {
+        $this->view->assign('value', $this->personRepository->findByBirthday($date));
+    }
+
+
+    /* ----------------- POST -------------*/
 
     /**
      * initialize action create
@@ -82,6 +117,7 @@ class ExampleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         $this->view->assign('value', ['success' => 1]);
     }
 
+    /*-----------------------------------------------------------------*/
 
     /**
      * error action
@@ -92,11 +128,12 @@ class ExampleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
 
         $response = [
             'success' => 0,
-            'errors' => $flattenedValidationErrors['person']
+            'errors'  => $flattenedValidationErrors['person'],
         ];
 
         $this->view->assign('value', $response);
     }
+
 
     /**
      * addPropertyMappingConfiguration
@@ -104,13 +141,21 @@ class ExampleController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     protected function addPropertyMappingConfiguration()
     {
         if ($this->request->hasArgument('person')) {
-            $propertyMappingConfiguration = (new PropertyMappingConfigurationBuilder())->build('TYPO3\\CMS\\Extbase\\Mvc\\Controller\\MvcPropertyMappingConfiguration');
-            $propertyMappingConfiguration->setTypeConverterOption(PersistentObjectConverter::class, PersistentObjectConverter::CONFIGURATION_CREATION_ALLOWED, TRUE);
+            $propertyMappingConfiguration = (new PropertyMappingConfigurationBuilder())->build(
+                'TYPO3\\CMS\\Extbase\\Mvc\\Controller\\MvcPropertyMappingConfiguration'
+            );
+            $propertyMappingConfiguration->setTypeConverterOption(
+                PersistentObjectConverter::class,
+                PersistentObjectConverter::CONFIGURATION_CREATION_ALLOWED,
+                true
+            );
 
             foreach ($this->request->getArgument('person') as $propertyName => $value) {
                 $propertyMappingConfiguration->allowProperties($propertyName);
             }
+
             $this->arguments->getArgument('person')->injectPropertyMappingConfiguration($propertyMappingConfiguration);
         }
     }
+
 }

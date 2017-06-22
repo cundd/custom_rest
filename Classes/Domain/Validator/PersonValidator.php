@@ -1,4 +1,5 @@
 <?php
+
 namespace Cundd\CustomRest\Domain\Validator;
 
 use Cundd\CustomRest\Domain\Model\Person;

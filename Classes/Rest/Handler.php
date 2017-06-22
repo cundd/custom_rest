@@ -59,30 +59,36 @@ class Handler implements HandlerInterface
     protected $responseFactory;
 
     /**
+     * @var \Cundd\CustomRest\Rest\Helper
+     * @inject
+     */
+    protected $helper;
+
+
+    /**
      * @inheritDoc
      */
     public function configureRoutes(RouterInterface $router, RestRequestInterface $request)
     {
+        /*------------------------------------------------------
+         * Simple callback functions
+         *-----------------------------------------------------*/
+
+        /*
+         * These customhandler example routes return hardcoded values. They do not call any
+         * extbase controller functions. (For that, see PersonController and Routes below.)
+         */
+
         # curl -X GET http://localhost:8888/rest/customhandler
         $router->add(
             Route::get(
                 $request->getResourceType(),
                 function (RestRequestInterface $request) {
-                    return array(
+                    return [
                         'path'         => $request->getPath(),
                         'uri'          => (string)$request->getUri(),
                         'resourceType' => (string)$request->getResourceType(),
-                    );
-                }
-            )
-        );
-
-        # curl -X GET http://localhost:8888/rest/cundd-custom_rest-require
-        $router->add(
-            Route::get(
-                'cundd-custom_rest-require',
-                function () {
-                    return 'Access Granted';
+                    ];
                 }
             )
         );
@@ -92,11 +98,26 @@ class Handler implements HandlerInterface
             Route::get(
                 $request->getResourceType() . '/subpath',
                 function (RestRequestInterface $request) {
-                    return array(
+                    return [
                         'path'         => $request->getPath(),
                         'uri'          => (string)$request->getUri(),
                         'resourceType' => (string)$request->getResourceType(),
-                    );
+                    ];
+                }
+            )
+        );
+
+        # curl -X POST -d '{"username":"johndoe","password":"123456"}' http://localhost:8888/rest/customhandler/subpath
+        $router->add(
+            Route::post(
+                $request->getResourceType() . '/subpath',
+                function (RestRequestInterface $request) {
+                    return [
+                        'path'         => $request->getPath(),
+                        'uri'          => (string)$request->getUri(),
+                        'resourceType' => (string)$request->getResourceType(),
+                        'data'         => $request->getSentData(),
+                    ];
                 }
             )
         );
@@ -106,12 +127,12 @@ class Handler implements HandlerInterface
             Route::get(
                 $request->getResourceType() . '/parameter/{slug}',
                 function (RestRequestInterface $request, $slug) {
-                    return array(
+                    return [
                         'slug'         => $slug,
                         'path'         => $request->getPath(),
                         'uri'          => (string)$request->getUri(),
                         'resourceType' => (string)$request->getResourceType(),
-                    );
+                    ];
                 }
             )
         );
@@ -121,13 +142,13 @@ class Handler implements HandlerInterface
             Route::get(
                 $request->getResourceType() . '/{int}',
                 function (RestRequestInterface $request, $parameter) {
-                    return array(
+                    return [
                         'value'         => $parameter,
                         'parameterType' => gettype($parameter),
                         'path'          => $request->getPath(),
                         'uri'           => (string)$request->getUri(),
                         'resourceType'  => (string)$request->getResourceType(),
-                    );
+                    ];
                 }
             )
         );
@@ -137,13 +158,13 @@ class Handler implements HandlerInterface
             Route::get(
                 $request->getResourceType() . '/decimal/{float}',
                 function (RestRequestInterface $request, $parameter) {
-                    return array(
+                    return [
                         'value'         => $parameter,
                         'parameterType' => gettype($parameter),
                         'path'          => $request->getPath(),
                         'uri'           => (string)$request->getUri(),
                         'resourceType'  => (string)$request->getResourceType(),
-                    );
+                    ];
                 }
             )
         );
@@ -154,31 +175,204 @@ class Handler implements HandlerInterface
             Route::get(
                 $request->getResourceType() . '/bool/{bool}',
                 function (RestRequestInterface $request, $parameter) {
-                    return array(
+                    return [
                         'value'         => $parameter,
                         'parameterType' => gettype($parameter),
                         'path'          => $request->getPath(),
                         'uri'           => (string)$request->getUri(),
                         'resourceType'  => (string)$request->getResourceType(),
+                    ];
+                }
+            )
+        );
+
+
+        /*------------------------------------------------------
+         * Sample Route for a "require" path
+         *-----------------------------------------------------*/
+
+        /*
+         * To access this route a valid login is required.
+         * This requirement is defined in ext_typoscript_setup.txt line 9
+         */
+        # curl -X GET http://localhost:8888/rest/cundd-custom_rest-require
+        $router->add(
+            Route::get(
+                'cundd-custom_rest-require',
+                function () {
+                    return 'Access Granted';
+                }
+            )
+        );
+
+
+        /*------------------------------------------------------
+         * Sample Routes for Controller "Person"
+         *-----------------------------------------------------*/
+
+        /*
+         * To define a new "base" route, a specific path is assigned to Route::get
+         * instead of the universal $request->getResourceType(). Here it is the path
+         * "/cundd-custom_rest-person"
+         */
+
+        /* ------------ GET ------------- */
+
+        # curl -X GET http://localhost:8888/rest/cundd-custom_rest-person
+        $router->add(
+            Route::get(
+                '/cundd-custom_rest-person',
+                function (RestRequestInterface $request) {
+                    return $this->helper->callExtbasePlugin(
+                        'customRest',
+                        'Cundd',
+                        'CustomRest',
+                        'Person',
+                        'list',
+                        []
                     );
                 }
             )
         );
 
-        # curl -X POST -d '{"username":"johndoe","password":"123456"}' http://localhost:8888/rest/customhandler/subpath
+        # curl -X GET http://localhost:8888/rest/cundd-custom_rest-person/show/12
         $router->add(
-            Route::post(
-                $request->getResourceType() . '/subpath',
-                function (RestRequestInterface $request) {
-                    return array(
-                        'path'         => $request->getPath(),
-                        'uri'          => (string)$request->getUri(),
-                        'resourceType' => (string)$request->getResourceType(),
-                        'data'         => $request->getSentData(),
+            Route::get(
+                '/cundd-custom_rest-person/show/{int}',
+                function (RestRequestInterface $request, $int) {
+                    $arguments = [
+                        'uid' => $int,
+                    ];
+
+                    return $this->helper->callExtbasePlugin(
+                        'customRest',
+                        'Cundd',
+                        'CustomRest',
+                        'Person',
+                        'show',
+                        $arguments
                     );
                 }
             )
         );
+
+        # curl -X GET http://localhost:8888/rest/cundd-custom_rest-person/firstname/daniel
+        $router->add(
+            Route::get(
+                '/cundd-custom_rest-person/firstname/{slug}',
+                function (RestRequestInterface $request, $slug) {
+                    $arguments = [
+                        'firstName' => $slug,
+                    ];
+
+                    return $this->helper->callExtbasePlugin(
+                        'customRest',
+                        'Cundd',
+                        'CustomRest',
+                        'Person',
+                        'firstName',
+                        $arguments
+                    );
+                }
+            )
+        );
+
+        # curl -X GET http://localhost:8888/rest/cundd-custom_rest-person/lastname/corn
+        $router->add(
+            Route::get(
+                '/cundd-custom_rest-person/lastname/{slug}',
+                function (RestRequestInterface $request, $slug) {
+                    $arguments = [
+                        'lastName' => $slug,
+                    ];
+
+                    return $this->helper->callExtbasePlugin(
+                        'customRest',
+                        'Cundd',
+                        'CustomRest',
+                        'Person',
+                        'lastName',
+                        $arguments
+                    );
+                }
+            )
+        );
+
+        # curl -X GET http://localhost:8888/rest/cundd-custom_rest-person/birthday/0000-00-00
+        $router->add(
+            Route::get(
+                '/cundd-custom_rest-person/birthday/{slug}',
+                function (RestRequestInterface $request, $slug) {
+                    $arguments = [
+                        'date' => $slug,
+                    ];
+
+                    return $this->helper->callExtbasePlugin(
+                        'customRest',
+                        'Cundd',
+                        'CustomRest',
+                        'Person',
+                        'birthday',
+                        $arguments
+                    );
+                }
+            )
+        );
+
+
+        /*------------------------------------------------------
+         * Detailed error routes for empty person path endpoints
+         *-----------------------------------------------------*/
+
+        /*
+         * Don't do that. Better use an error Object that accepts detailed info. A base error
+         * class ist implemented in rest anyway... overwrite/extend that?
+         */
+
+        # curl -X GET http://localhost:8888/rest/cundd-custom_rest-person/show
+        $router->add(
+            Route::get(
+                '/cundd-custom_rest-person/show',
+                /** @var Request $request */
+                function (RestRequestInterface $request) {
+                    return [
+                        'error' => 'Please add a unique id of the data you are looking for: /person/show/{uid}.',
+                    ];
+                }
+            )
+        );
+
+        # curl -X GET http://localhost:8888/rest/cundd-custom_rest-person/lastname
+        $router->add(
+            Route::get(
+                '/cundd-custom_rest-person/lastname',
+                function (RestRequestInterface $request) {
+                    return $this->responseFactory->createErrorResponse(
+                        'Please add a last name: /cundd-custom_rest-person/lastname/{lastName}.',
+                        404,
+                        $request
+                    );
+                }
+            )
+        );
+
+        # curl -X GET http://localhost:8888/rest/cundd-custom_rest-person/firstname
+        $router->add(
+            Route::get(
+                '/cundd-custom_rest-person/firstname',
+                /** @var Request $request */
+                function (RestRequestInterface $request) {
+                    return $this->responseFactory->createErrorResponse(
+                        'Please add a first name: /cundd-custom_rest-person/firstname/{firstName}.',
+                        404,
+                        $request
+                    );
+                }
+            )
+        );
+
+
+        /* ------------ POST ------------- */
 
         # curl -X POST -H "Content-Type: application/json" -d '{"firstName":"john","lastName":"john"}' http://localhost:8888/rest/customhandler/create
         $router->add(
@@ -190,62 +384,17 @@ class Handler implements HandlerInterface
                         'person' => $request->getSentData(),
                     ];
 
-                    return $this->callExtbasePlugin(
-                        'myPlugin',
+                    return $this->helper->callExtbasePlugin(
+                        'customRest',
                         'Cundd',
                         'CustomRest',
-                        'Example',
+                        'Person',
                         'create',
                         $arguments
                     );
                 }
             )
         );
-    }
 
-    /**
-     * calls a extbase plugin
-     *
-     * @param string $pluginName     the name of the plugin like configured in ext_localconf.php
-     * @param string $vendorName     the name of the vendor (if no vendor use '')
-     * @param string $extensionName  the name of the extension
-     * @param string $controllerName the name of the controller
-     * @param string $actionName     the name of the action to call
-     * @param array  $arguments      the arguments to pass to the action
-     * @return string
-     */
-    protected function callExtbasePlugin(
-        $pluginName,
-        $vendorName,
-        $extensionName,
-        $controllerName,
-        $actionName,
-        $arguments
-    ) {
-        $pluginNamespace = strtolower('tx_' . $extensionName . '_' . $pluginName);
-
-        $_POST[$pluginNamespace]['controller'] = $controllerName;
-        $_POST[$pluginNamespace]['action'] = $actionName;
-
-        $keys = array_keys($arguments);
-        foreach ($keys as $key) {
-            $_POST[$pluginNamespace][$key] = $arguments[$key];
-        }
-
-        $configuration = [
-            'extensionName' => $extensionName,
-            'pluginName'    => $pluginName,
-        ];
-
-        if (!empty($vendorName)) {
-            $configuration['vendorName'] = $vendorName;
-        }
-
-        /** @var \TYPO3\CMS\Extbase\Core\Bootstrap $bootstrap */
-        $bootstrap = $this->objectManager->get(\TYPO3\CMS\Extbase\Core\Bootstrap::class);
-
-        $response = $bootstrap->run('', $configuration);
-
-        return $this->responseFactory->createResponse($response, 200);
     }
 }
