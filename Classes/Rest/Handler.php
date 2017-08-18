@@ -190,7 +190,7 @@ class Handler implements HandlerInterface
         # curl -X GET http://localhost:8888/rest/cundd-custom_rest-person
         $router->add(
             Route::get(
-                '/cundd-custom_rest-person',
+                '/cundd-custom_rest-person/?',
                 function (RestRequestInterface $request) {
                     return $this->helper->callExtbasePlugin(
                         'customRest',
@@ -207,7 +207,7 @@ class Handler implements HandlerInterface
         # curl -X GET http://localhost:8888/rest/cundd-custom_rest-person/show/12
         $router->add(
             Route::get(
-                '/cundd-custom_rest-person/show/{int}',
+                '/cundd-custom_rest-person/show/{int}/?',
                 function (RestRequestInterface $request, $int) {
                     $arguments = [
                         'uid' => $int,
@@ -228,7 +228,7 @@ class Handler implements HandlerInterface
         # curl -X GET http://localhost:8888/rest/cundd-custom_rest-person/firstname/daniel
         $router->add(
             Route::get(
-                '/cundd-custom_rest-person/firstname/{slug}',
+                '/cundd-custom_rest-person/firstname/{slug}/?',
                 function (RestRequestInterface $request, $slug) {
                     $arguments = [
                         'firstName' => $slug,
@@ -249,7 +249,7 @@ class Handler implements HandlerInterface
         # curl -X GET http://localhost:8888/rest/cundd-custom_rest-person/lastname/corn
         $router->add(
             Route::get(
-                '/cundd-custom_rest-person/lastname/{slug}',
+                '/cundd-custom_rest-person/lastname/{slug}/?',
                 function (RestRequestInterface $request, $slug) {
                     $arguments = [
                         'lastName' => $slug,
@@ -270,7 +270,7 @@ class Handler implements HandlerInterface
         # curl -X GET http://localhost:8888/rest/cundd-custom_rest-person/birthday/0000-00-00
         $router->add(
             Route::get(
-                '/cundd-custom_rest-person/birthday/{slug}',
+                '/cundd-custom_rest-person/birthday/{slug}/?',
                 function (RestRequestInterface $request, $slug) {
                     $arguments = [
                         'date' => $slug,
@@ -301,7 +301,7 @@ class Handler implements HandlerInterface
         # curl -X GET http://localhost:8888/rest/cundd-custom_rest-person/show
         $router->add(
             Route::get(
-                '/cundd-custom_rest-person/show',
+                '/cundd-custom_rest-person/show/?',
                 /** @var Request $request */
                 function (RestRequestInterface $request) {
                     return [
@@ -314,7 +314,7 @@ class Handler implements HandlerInterface
         # curl -X GET http://localhost:8888/rest/cundd-custom_rest-person/lastname
         $router->add(
             Route::get(
-                '/cundd-custom_rest-person/lastname',
+                '/cundd-custom_rest-person/lastname/?',
                 function (RestRequestInterface $request) {
                     return $this->responseFactory->createErrorResponse(
                         'Please add a last name: /cundd-custom_rest-person/lastname/{lastName}.',
@@ -328,7 +328,7 @@ class Handler implements HandlerInterface
         # curl -X GET http://localhost:8888/rest/cundd-custom_rest-person/firstname
         $router->add(
             Route::get(
-                '/cundd-custom_rest-person/firstname',
+                '/cundd-custom_rest-person/firstname/?',
                 /** @var Request $request */
                 function (RestRequestInterface $request) {
                     return $this->responseFactory->createErrorResponse(
@@ -346,7 +346,7 @@ class Handler implements HandlerInterface
         # curl -X POST -H "Content-Type: application/json" -d '{"firstName":"john","lastName":"john"}' http://localhost:8888/rest/customhandler/create
         $router->add(
             Route::post(
-                $request->getResourceType() . '/create',
+                $request->getResourceType() . '/create/?',
                 function (RestRequestInterface $request) {
                     /** @var Request $request */
                     $arguments = [

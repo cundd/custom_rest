@@ -2,6 +2,8 @@
 
 namespace Cundd\CustomRest\Rest;
 
+use Cundd\Rest\Http\Header;
+
 class Helper
 {
     /**
@@ -58,8 +60,9 @@ class Helper
         /** @var \TYPO3\CMS\Extbase\Core\Bootstrap $bootstrap */
         $bootstrap = $this->objectManager->get(\TYPO3\CMS\Extbase\Core\Bootstrap::class);
 
-        $response = $bootstrap->run('', $configuration);
+        $extbaseResult = $bootstrap->run('', $configuration);
+        $response = $this->responseFactory->createResponse($extbaseResult, 200);
 
-        return $this->responseFactory->createResponse($response, 200);
+        return $response->withHeader(Header::CONTENT_TYPE, 'application/json');
     }
 }
