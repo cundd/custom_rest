@@ -10,8 +10,6 @@ use Cundd\Rest\Router\RouterInterface;
 
 /**
  * Example handler
- *
- * @package Cundd\Rest\Handler
  */
 class Handler implements HandlerInterface
 {
