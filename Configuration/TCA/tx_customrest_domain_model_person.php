@@ -26,7 +26,7 @@ return [
                 'endtime'   => 'endtime',
             ),
             'searchFields'             => 'first_name,last_name,birthday,',
-            'iconfile'                 => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath('custom_rest')
+            'iconfile'                 => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('custom_rest')
                 . 'Resources/Public/Icons/tx_customrest_domain_model_person.gif',
         ]
     ,
