@@ -8,7 +8,7 @@ CREATE TABLE tx_customrest_domain_model_person (
 
 	first_name varchar(255) DEFAULT '' NOT NULL,
 	last_name varchar(255) DEFAULT '' NOT NULL,
-	birthday date DEFAULT '0000-00-00',
+	birthday date,
 
 	tstamp int(11) unsigned DEFAULT '0' NOT NULL,
 	crdate int(11) unsigned DEFAULT '0' NOT NULL,
