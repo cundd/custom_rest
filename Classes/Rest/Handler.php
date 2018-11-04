@@ -4,7 +4,6 @@ namespace Cundd\CustomRest\Rest;
 
 use Cundd\Rest\Handler\HandlerInterface;
 use Cundd\Rest\Http\RestRequestInterface;
-use Cundd\Rest\Request;
 use Cundd\Rest\Router\Route;
 use Cundd\Rest\Router\RouterInterface;
 
@@ -42,7 +41,7 @@ class Handler implements HandlerInterface
          *-----------------------------------------------------*/
 
         /*
-         * These customhandler example routes return hardcoded values. They do not call any
+         * These custom handler example routes return hardcoded values. They do not call any
          * extbase controller functions. (For that, see PersonController and Routes below.)
          */
 
@@ -300,7 +299,6 @@ class Handler implements HandlerInterface
         $router->add(
             Route::get(
                 '/cundd-custom_rest-person/show/?',
-                /** @var Request $request */
                 function (RestRequestInterface $request) {
                     return [
                         'error' => 'Please add a unique id of the data you are looking for: /person/show/{uid}.',
@@ -327,7 +325,6 @@ class Handler implements HandlerInterface
         $router->add(
             Route::get(
                 '/cundd-custom_rest-person/firstname/?',
-                /** @var Request $request */
                 function (RestRequestInterface $request) {
                     return $this->responseFactory->createErrorResponse(
                         'Please add a first name: /cundd-custom_rest-person/firstname/{firstName}.',
@@ -346,7 +343,6 @@ class Handler implements HandlerInterface
             Route::post(
                 $request->getResourceType() . '/create/?',
                 function (RestRequestInterface $request) {
-                    /** @var Request $request */
                     $arguments = [
                         'person' => $request->getSentData(),
                     ];
@@ -362,6 +358,5 @@ class Handler implements HandlerInterface
                 }
             )
         );
-
     }
 }

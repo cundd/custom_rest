@@ -2,11 +2,11 @@
 
 namespace Cundd\CustomRest\Controller;
 
-use \Cundd\CustomRest\Domain\Model\Person;
+use Cundd\CustomRest\Domain\Model\Person;
+use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\Controller\MvcPropertyMappingConfiguration;
-use \TYPO3\CMS\Extbase\Property\PropertyMappingConfigurationBuilder;
-use \TYPO3\CMS\Extbase\Property\TypeConverter\PersistentObjectConverter;
-use \TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
+use TYPO3\CMS\Extbase\Property\PropertyMappingConfigurationBuilder;
+use TYPO3\CMS\Extbase\Property\TypeConverter\PersistentObjectConverter;
 
 /**
  * An example Extbase controller that will be called through REST
@@ -24,7 +24,7 @@ class PersonController extends ActionController
     protected $defaultViewObjectName = \TYPO3\CMS\Extbase\Mvc\View\JsonView::class;
 
     /**
-     * personRepository
+     * Person Repository
      *
      * @var \Cundd\CustomRest\Domain\Repository\PersonRepository
      * @inject
@@ -96,8 +96,7 @@ class PersonController extends ActionController
      */
     public function initializeCreateAction()
     {
-        // if the request does not come from a fluid form:
-        // * the properties which are allowed to map must be set manually
+        // If the request does not come from a fluid form the properties which are allowed to map must be set manually
         if (!$this->request->getInternalArgument('__trustedProperties')) {
             $this->addPropertyMappingConfiguration();
         }
@@ -149,12 +148,13 @@ class PersonController extends ActionController
                 true
             );
 
+            /** @noinspection PhpUnhandledExceptionInspection */
             foreach ((array)$this->request->getArgument('person') as $propertyName => $value) {
                 $propertyMappingConfiguration->allowProperties($propertyName);
             }
 
+            /** @noinspection PhpUnhandledExceptionInspection */
             $this->arguments->getArgument('person')->injectPropertyMappingConfiguration($propertyMappingConfiguration);
         }
     }
-
 }

@@ -3,13 +3,13 @@
 namespace Cundd\CustomRest\Domain\Validator;
 
 use Cundd\CustomRest\Domain\Model\Person;
+use TYPO3\CMS\Extbase\Validation\Validator\AbstractValidator;
 
 /**
  * Class PersonValidator
  */
-class PersonValidator extends \TYPO3\CMS\Extbase\Validation\Validator\AbstractValidator
+class PersonValidator extends AbstractValidator
 {
-
     /**
      * personRepository
      *

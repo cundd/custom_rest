@@ -3,6 +3,8 @@
 namespace Cundd\CustomRest\Rest;
 
 use Cundd\Rest\Http\Header;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class Helper
 {
@@ -27,8 +29,7 @@ class Helper
      * @param string $controllerName the name of the controller
      * @param string $actionName     the name of the action to call
      * @param array  $arguments      the arguments to pass to the action
-     *
-     * @return string
+     * @return ResponseInterface
      */
     public function callExtbasePlugin(
         $pluginName,
@@ -36,16 +37,19 @@ class Helper
         $extensionName,
         $controllerName,
         $actionName,
-        $arguments
+        array $arguments
     ) {
-        $pluginNamespace = strtolower('tx_' . $extensionName . '_' . $pluginName);
-
-        $_POST[$pluginNamespace]['controller'] = $controllerName;
-        $_POST[$pluginNamespace]['action'] = $actionName;
-
-        $keys = array_keys($arguments);
-        foreach ($keys as $key) {
-            $_POST[$pluginNamespace][$key] = $arguments[$key];
+        if (isset($GLOBALS['TYPO3_REQUEST'])) {
+            $GLOBALS['TYPO3_REQUEST'] = $this->patchRequest(
+                $GLOBALS['TYPO3_REQUEST'],
+                $pluginName,
+                $extensionName,
+                $controllerName,
+                $actionName,
+                $arguments
+            );
+        } else {
+            $this->patchGlobals($pluginName, $extensionName, $controllerName, $actionName, $arguments);
         }
 
         $configuration = [
@@ -64,5 +68,80 @@ class Helper
         $response = $this->responseFactory->createResponse($extbaseResult, 200);
 
         return $response->withHeader(Header::CONTENT_TYPE, 'application/json');
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     * @param string                 $pluginName
+     * @param string                 $extensionName
+     * @param string                 $controllerName
+     * @param string                 $actionName
+     * @param array                  $arguments
+     * @return ServerRequestInterface
+     */
+    private function patchRequest(
+        ServerRequestInterface $request,
+        $pluginName,
+        $extensionName,
+        $controllerName,
+        $actionName,
+        array $arguments
+    ) {
+        $queryParams = $request->getQueryParams();
+        $pluginNamespace = $this->getPluginNamespace($pluginName, $extensionName);
+        $this->patchQueryParams($queryParams, $controllerName, $actionName, $arguments, $pluginNamespace);
+
+        return $request->withQueryParams($queryParams);
+    }
+
+    /**
+     * @param string $pluginName
+     * @param string $extensionName
+     * @param string $controllerName
+     * @param string $actionName
+     * @param array  $arguments
+     */
+    private function patchGlobals(
+        $pluginName,
+        $extensionName,
+        $controllerName,
+        $actionName,
+        array $arguments
+    ) {
+        $pluginNamespace = $this->getPluginNamespace($pluginName, $extensionName);
+        $this->patchQueryParams($_POST, $controllerName, $actionName, $arguments, $pluginNamespace);
+    }
+
+    /**
+     * @param string $pluginName
+     * @param string $extensionName
+     * @return string
+     */
+    private function getPluginNamespace($pluginName, $extensionName)
+    {
+        return strtolower('tx_' . $extensionName . '_' . $pluginName);
+    }
+
+    /**
+     * @param array  $queryParams
+     * @param string $controllerName
+     * @param string $actionName
+     * @param array  $arguments
+     * @param string $pluginNamespace
+     */
+    private function patchQueryParams(
+        array &$queryParams,
+        $controllerName,
+        $actionName,
+        array $arguments,
+        $pluginNamespace
+    ) {
+        $queryParams[$pluginNamespace]['controller'] = $controllerName;
+        $queryParams[$pluginNamespace]['action'] = $actionName;
+
+        $keys = array_keys($arguments);
+        foreach ($keys as $key) {
+            $queryParams[$pluginNamespace][$key] = $arguments[$key];
+        }
     }
 }
