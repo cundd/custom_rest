@@ -6,6 +6,7 @@ use Cundd\Rest\Handler\HandlerInterface;
 use Cundd\Rest\Http\RestRequestInterface;
 use Cundd\Rest\Router\Route;
 use Cundd\Rest\Router\RouterInterface;
+use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
 /**
  * Example handler
@@ -98,6 +99,19 @@ class Handler implements HandlerInterface
                         'path'         => $request->getPath(),
                         'uri'          => (string)$request->getUri(),
                         'resourceType' => (string)$request->getResourceType(),
+                    ];
+                }
+            )
+        );
+
+        # curl -X GET http://localhost:8888/rest/customhandler/translate/tx_customrest_domain_model_person.first_name.json
+        $router->add(
+            Route::get(
+                $request->getResourceType() . '/translate/{slug}',
+                function (RestRequestInterface $request, $slug) {
+                    return [
+                        'original'   => $slug,
+                        'translated' => LocalizationUtility::translate($slug, 'custom_rest'),
                     ];
                 }
             )
