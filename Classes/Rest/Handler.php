@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnusedParameterInspection */
 
 namespace Cundd\CustomRest\Rest;
 
@@ -6,6 +6,7 @@ use Cundd\Rest\Handler\HandlerInterface;
 use Cundd\Rest\Http\RestRequestInterface;
 use Cundd\Rest\Router\Route;
 use Cundd\Rest\Router\RouterInterface;
+use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
 /**
@@ -30,7 +31,6 @@ class Handler implements HandlerInterface
      * @inject
      */
     protected $helper;
-
 
     /**
      * @inheritDoc
@@ -109,7 +109,13 @@ class Handler implements HandlerInterface
             Route::get(
                 $request->getResourceType() . '/translate/{slug}',
                 function (RestRequestInterface $request, $slug) {
+                    /** @var SiteLanguage $siteLanguage */
+                    $siteLanguage = isset($GLOBALS['TYPO3_REQUEST'])
+                        ? $GLOBALS['TYPO3_REQUEST']->getAttribute('language')
+                        : null;
+
                     return [
+                        'locale'     => $siteLanguage ? $siteLanguage->getLocale() : '',
                         'original'   => $slug,
                         'translated' => LocalizationUtility::translate($slug, 'custom_rest'),
                     ];
@@ -166,7 +172,6 @@ class Handler implements HandlerInterface
             )
         );
 
-
         /*------------------------------------------------------
          * Sample Route for a "require" path
          *-----------------------------------------------------*/
@@ -184,7 +189,6 @@ class Handler implements HandlerInterface
                 }
             )
         );
-
 
         /*------------------------------------------------------
          * Sample Routes for Controller "Person"
@@ -299,7 +303,6 @@ class Handler implements HandlerInterface
             )
         );
 
-
         /*------------------------------------------------------
          * Detailed error routes for empty person path endpoints
          *-----------------------------------------------------*/
@@ -348,7 +351,6 @@ class Handler implements HandlerInterface
                 }
             )
         );
-
 
         /* ------------ POST ------------- */
 
