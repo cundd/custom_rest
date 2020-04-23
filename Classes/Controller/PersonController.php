@@ -31,7 +31,6 @@ class PersonController extends ActionController
      */
     protected $personRepository;
 
-
     /* ----------------- GET -------------*/
 
     /**
@@ -114,6 +113,31 @@ class PersonController extends ActionController
         $this->view->assign('value', ['success' => 1]);
     }
 
+    /* ----------------- PATCH -------------*/
+
+    /**
+     * initialize action update
+     */
+    public function initializeUpdateAction()
+    {
+        // If the request does not come from a fluid form the properties which are allowed to map must be set manually
+        if (!$this->request->getInternalArgument('__trustedProperties')) {
+            $this->addPropertyMappingConfiguration();
+        }
+    }
+
+    /**
+     * action update
+     *
+     * @param \Cundd\CustomRest\Domain\Model\Person $person
+     */
+    public function updateAction(Person $person)
+    {
+        $this->personRepository->update($person);
+
+        $this->view->assign('value', ['success' => 1]);
+    }
+
     /*-----------------------------------------------------------------*/
 
     /**
@@ -130,7 +154,6 @@ class PersonController extends ActionController
 
         $this->view->assign('value', $response);
     }
-
 
     /**
      * addPropertyMappingConfiguration

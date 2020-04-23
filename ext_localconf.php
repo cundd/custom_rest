@@ -9,7 +9,7 @@ call_user_func(
         \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
             'Cundd.CustomRest',
             'customRest',
-            ['Person' => 'list,show,firstName,lastName,birthday,create'],
+            ['Person' => 'list,show,firstName,lastName,birthday,create,update'],
             ['Person' => '']
         );
     }

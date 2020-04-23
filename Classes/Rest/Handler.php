@@ -374,5 +374,27 @@ class Handler implements HandlerInterface
                 }
             )
         );
+
+        # curl -X PATCH -H "Content-Type: application/json" -d '{"firstName":"john","lastName":"john"}' http://localhost:8888/rest/customhandler/update/1
+        $router->add(
+            Route::patch(
+                $request->getResourceType() . '/update/{int}/?',
+                function (RestRequestInterface $request, $id) {
+                    $arguments = [
+                        'person' => $request->getSentData(),
+                    ];
+                    $arguments['person']['__identity'] = $id;
+
+                    return $this->helper->callExtbasePlugin(
+                        'customRest',
+                        'Cundd',
+                        'CustomRest',
+                        'Person',
+                        'update',
+                        $arguments
+                    );
+                }
+            )
+        );
     }
 }
